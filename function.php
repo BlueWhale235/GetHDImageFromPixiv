@@ -1,24 +1,4 @@
 <?php
-require_once 'defined.php';
-/* Main */
-function getAjax($picId)
-{
-    $ajaxCont = curl_init(); //$ajax_c --> ajax_content
-    $Url = 'https://www.pixiv.net/ajax/illust/' . $picId . "?lang=zh";
-    curl_init_func($ajaxCont, $Url, _REFER, _COOKIES, _UA);
-    $t = [];
-    $t = json_decode(curl_exec($ajaxCont), true);
-    //get page number
-    $picNum = $t['body']['pageCount'];
-    $picUrl = $t['body']['urls']['original'];
-    $pathParts = pathinfo($picUrl);
-    $arrUrl = [];
-    for ($i = 0; $i < $picNum; $i++) {
-        $arrUrl[$i] = $pathParts['dirname'] . '/' . $picId . '_p' . $i . '.' . $pathParts['extension'];
-    }
-    return $arrUrl;
-}
-
 function dirToArray($dir)
 {
     $result = [];
@@ -53,11 +33,30 @@ function pageCount($pid, $name)
     } else return -1;
 }
 
-function curl_init_func($Curl_Handle, $Url, $Refer, $COOKIES, $UA)
+function getAjax($picId)
 {
-    curl_setopt($Curl_Handle, CURLOPT_REFERER, $Refer);
-    curl_setopt($Curl_Handle, CURLOPT_COOKIE, $COOKIES);
-    curl_setopt($Curl_Handle, CURLOPT_USERAGENT, $UA);
-    curl_setopt($Curl_Handle, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($Curl_Handle, CURLOPT_URL, $Url);
+    $Header = [
+        'cookie'            => _COOKIE,
+        'referer'           => _REFERER,
+        'user-agent'        => _UA,
+        'accept-language'   => _LANG
+    ];
+    $Url = 'https://www.pixiv.net/ajax/illust/' . $picId . "?lang=zh";
+    $request = new GuzzleHttp\Client([
+        'headers'           => $Header,
+        'connect_timeout'   => 3,
+        'http_errors'       => false
+    ]);
+    $response = $request->request('GET', $Url);
+    $response_cont = json_decode($response->getBody()->getContents(),true);
+    //get page count
+    $picCount = $response_cont['body']['pageCount'] ?? -1;
+    $picUrl = $response_cont['body']['urls']['original'] ?? 'none';
+    $pathParts = pathinfo($picUrl);
+    $arr = [];
+    for ($i = 0; $i < $picCount; $i++) {
+        $arr[$i] = $pathParts['dirname'] . '/' . $picId . '_p' . $i . '.' . $pathParts['extension'];
+    }
+    $arr['code'] = $response->getStatusCode();
+    return $arr;
 }

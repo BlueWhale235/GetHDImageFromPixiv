@@ -1,0 +1,5 @@
+defined.php
+testdir/*
+dl/*
+vendor/*
+composer.lock
