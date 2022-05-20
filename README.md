@@ -5,3 +5,5 @@
 👉使用前先用 `composer install` 安装依赖  
 👉需要php拓展：`fileinfo`  
 👉服务器信息：Apache, php8.0  
+# License
+Apache License
