@@ -6,4 +6,4 @@
 👉需要php拓展：`fileinfo`  
 👉服务器信息：Apache, php8.0  
 # License
-Apache License
+GPL V3
