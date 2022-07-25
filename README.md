@@ -18,4 +18,4 @@
 * [filp/whoops](https://github.com/filp/whoops)
 
 # License
-GPL V3
+[GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)
